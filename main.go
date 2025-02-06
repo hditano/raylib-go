@@ -8,9 +8,10 @@ const (
 )
 
 type Sprite struct {
-	Pos   rl.Vector2
-	Speed rl.Vector2
-	Color rl.Color
+	Pos       rl.Vector2
+	Speed     rl.Vector2
+	Color     rl.Color
+	Direction rl.Vector2
 }
 
 type Game struct {
@@ -36,6 +37,13 @@ func (g *Game) Init() {
 	}
 }
 
+func boolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
+
 func main() {
 	rl.InitWindow(width, height, "Raylib-go test")
 	defer rl.CloseWindow()
@@ -53,6 +61,13 @@ func main() {
 		rl.DrawText("Congrats, Raylib-go First created", 190, 200, 20, rl.LightGray)
 
 		rl.DrawRectangleV(game.player.Pos, rl.Vector2{X: 50, Y: 50}, game.player.Color)
+
+		game.player.Direction.X = float32(boolToInt(rl.IsKeyDown(rl.KeyRight)) - boolToInt(rl.IsKeyDown(rl.KeyLeft)))
+		game.player.Direction.Y = float32(boolToInt(rl.IsKeyDown(rl.KeyDown)) - boolToInt(rl.IsKeyDown(rl.KeyUp)))
+
+		dt := rl.GetFrameTime()
+		game.player.Pos.X += game.player.Direction.X * 400 * dt
+		game.player.Pos.Y += game.player.Direction.Y * 400 * dt
 
 		for _, ball := range game.ball {
 			rl.DrawCircleV(ball.Pos, 20, ball.Color)
