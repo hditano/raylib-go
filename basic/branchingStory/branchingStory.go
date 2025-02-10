@@ -12,6 +12,21 @@ type storyNode struct {
 	noPath  *storyNode
 }
 
+func (node *storyNode) printStory(depth int) {
+
+	for i := 0; i < depth; i++ {
+		fmt.Print("  ")
+	}
+
+	fmt.Println(node.text)
+	if node.yesPath != nil {
+		node.yesPath.printStory(depth + 1)
+	}
+	if node.noPath != nil {
+		node.noPath.printStory(depth + 1)
+	}
+}
+
 func (node *storyNode) play() {
 	fmt.Println(node.text)
 	scanner := bufio.NewScanner((os.Stdin))
@@ -45,5 +60,6 @@ func main() {
 	root.noPath = &winning
 
 	root.play()
+	root.printStory(1)
 
 }
