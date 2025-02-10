@@ -1,5 +1,10 @@
 package main
 
+// TODO
+// NPC - talk to them, fight
+// NPC move around the graph
+// items that can picked up or placed down
+
 import (
 	"bufio"
 	"fmt"
