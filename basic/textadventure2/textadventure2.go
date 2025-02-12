@@ -8,6 +8,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 )
@@ -21,12 +22,30 @@ type choice struct {
 type storyNode struct {
 	text    string
 	choices []*choice
+	npc     *npc
+}
+
+type npc struct {
+	name            []string
+	dialogue        []string
+	nextNode        *storyNode
+	currentName     string
+	currentDialogue string
+}
+
+func (npcNode *npc) addNpc() {
+	if npcNode.nextNode != nil {
+		name := npcNode.name[rand.Intn(len(npcNode.name))]
+		dialogue := npcNode.dialogue[rand.Intn(len(npcNode.dialogue))]
+
+		npcNode.currentName = name
+		npcNode.currentDialogue = dialogue
+	}
 }
 
 func (node *storyNode) addChoice(cmd string, description string, nextNode *storyNode) {
 	choice := &choice{cmd, description, nextNode}
 	node.choices = append(node.choices, choice)
-
 }
 
 func (node *storyNode) render() {
@@ -35,6 +54,9 @@ func (node *storyNode) render() {
 		for _, choice := range node.choices {
 			fmt.Println(choice.cmd, choice.description)
 		}
+	}
+	if node.npc != nil {
+		fmt.Printf("Npc %s says %s\n", node.npc.currentName, node.npc.currentDialogue)
 	}
 }
 
@@ -65,9 +87,6 @@ func printArray(a [3]string) {
 }
 
 func main() {
-
-	fmt.Println("Imprimiendo slice de choice")
-
 	scanner = bufio.NewScanner(os.Stdin)
 
 	start := storyNode{text: `You are in large chamber, deep underground. You see three passages leading out. A north apssage leads into darkness.
@@ -92,6 +111,22 @@ func main() {
 
 	darkRoomLit.addChoice("N", "Go North", &treasure)
 	darkRoomLit.addChoice("S", "Go South", &start)
+
+	// NPCs
+
+	npcS := npc{
+		[]string{"Zoe", "Gime", "Seba", "Tomas"},
+		[]string{"Hello, How are you?", "What are you doing Here!!"},
+		&start,
+		"",
+		"",
+	}
+
+	start.npc = &npcS
+
+	start.npc.addNpc()
+
+	// Start Game
 
 	start.play()
 
