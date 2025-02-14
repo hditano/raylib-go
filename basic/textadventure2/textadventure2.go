@@ -11,6 +11,8 @@ import (
 	"math/rand"
 	"os"
 	"strings"
+
+	"github.com/hditano/basic/textadventure2/items"
 )
 
 type choice struct {
@@ -23,6 +25,7 @@ type storyNode struct {
 	text    string
 	choices []*choice
 	npc     *npc
+	item    *item
 }
 
 type npc struct {
@@ -33,6 +36,27 @@ type npc struct {
 	currentDialogue string
 }
 
+type player struct {
+	name         string
+	inventory    []*item
+	startingItem item
+}
+
+// TODO
+type item struct {
+	generation  bool
+	name        string
+	description string
+}
+
+func (myPlayer *player) Player(name string) {
+	myPlayer.name = name
+
+	myPlayer.startingItem = myPlayer.startingItem.itemGeneration()
+
+	fmt.Printf("My item is: %s %s %s\n", myPlayer.name, myPlayer.startingItem.name, myPlayer.startingItem.description)
+}
+
 func (npcNode *npc) addNpc() {
 	if npcNode.nextNode != nil {
 		name := npcNode.name[rand.Intn(len(npcNode.name))]
@@ -41,6 +65,19 @@ func (npcNode *npc) addNpc() {
 		npcNode.currentName = name
 		npcNode.currentDialogue = dialogue
 	}
+}
+
+func (inventory *item) itemGeneration() item {
+	name := items.ItemsNames[rand.Intn(len(items.ItemsNames))]
+	description := items.DescriptionNames[rand.Intn(len(items.DescriptionNames))]
+
+	newItem := item{
+		generation:  false,
+		name:        name,
+		description: description,
+	}
+
+	return newItem
 }
 
 func (node *storyNode) addChoice(cmd string, description string, nextNode *storyNode) {
@@ -125,6 +162,14 @@ func main() {
 	start.npc = &npcS
 
 	start.npc.addNpc()
+
+	// Player
+
+	myplayer := player{}
+
+	myplayer.Player("Hernan")
+
+	// Item Generation
 
 	// Start Game
 
